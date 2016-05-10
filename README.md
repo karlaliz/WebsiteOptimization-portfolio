@@ -6,7 +6,6 @@
 Optimizations:
 
  1. Removed fonts
-
  1. Added media print and media portrait to CSS
  1. Compress and inline CSS
  1. Added link to pizzeria.jpg
