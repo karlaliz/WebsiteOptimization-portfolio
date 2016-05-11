@@ -436,7 +436,8 @@ var resizePizzas = function(size) {
           console.log("bug in sizeSwitcher");
       }
     } 
-    var randomPizzas = document.querySelectorAll(".randomPizzaContainer");
+    // replace querySelectorAll for get ElementsByClass
+    var randomPizzas = document.getElementsByClassName("randomPizzaContainer");
     for (var i = 0; i < randomPizzas.length; i++) {
       randomPizzas[i].style.width = sizeSwitcher (size) + "%";
     }
@@ -453,9 +454,10 @@ var resizePizzas = function(size) {
 
 window.performance.mark("mark_start_generating"); // collect timing data
 
+// Moved outside the for-loop the var pizzaDiv
+var pizzasDiv = document.getElementById("randomPizzas");
 // This for-loop actually creates and appends all of the pizzas when the page loads
 for (var i = 2; i < 100; i++) {
-  var pizzasDiv = document.getElementById("randomPizzas");
   pizzasDiv.appendChild(pizzaElementGenerator(i));
 }
 
@@ -481,7 +483,8 @@ function logAverageFrame(times) {   // times is the array of User Timing measure
 
 // The following code for sliding background pizzas was pulled from Ilya's demo found at:
 // https://www.igvita.com/slides/2012/devtools-tips-and-tricks/jank-demo.html
-
+// create le var COLs inested od number of colums
+var COLS = 8;
 // Moves the sliding background pizzas based on scroll position
 function updatePositions() {
   frame++;
@@ -490,10 +493,17 @@ function updatePositions() {
   // Added the variable scrollTop and pased inestead document.body.scrollTop
 
   var scrollTop = document.body.scrollTop;
-  var items = document.querySelectorAll('.mover');
+  // Added the new var colums to create the new Array of number of columns
+  var columns = new Array(COLS);
+  for(var i = 0; i < columns.length; i++) {
+    columns[i] = Math.sin((scrollTop / 1250)+i) * 100;
+  }
+  // replace querySelectorAll for get ElementsByClass
+  var items = document.getElementsByClassName('mover');
   for (var i = 0; i < items.length; i++) {
-    var phase = Math.sin((scrollTop / 1250) + (i % 5));
-    items[i].style.left = items[i].basicLeft + 100 * phase + 'px';
+    var position = columns[i % COLS];
+    // Use the transform  translate for update the position
+    items[i].style.transform='translateX(' + position + 'px)';
   }
 
   // User Timing API to the rescue again. Seriously, it's worth learning.
@@ -511,15 +521,17 @@ window.addEventListener('scroll', updatePositions);
 
 // Generates the sliding pizzas when the page loads.
 document.addEventListener('DOMContentLoaded', function() {
-  var cols = 8;
+  var cols = COLS;
   var s = 256;
-  for (var i = 0; i < 200; i++) {
-    var elem = document.createElement('img');
+  // Create the var element outside the forloop and reduce the number of pizzas that are being rendering.
+  var elem;
+  for (var i = 0; i < 48; i++) {
+    elem = document.createElement('img');
     elem.className = 'mover';
     elem.src = "images/pizza.png";
     elem.style.height = "100px";
     elem.style.width = "73.333px";
-    elem.basicLeft = (i % cols) * s;
+    elem.style.left = (i % cols) * s + 'px';
     elem.style.top = (Math.floor(i / cols) * s) + 'px';
     document.querySelector("#movingPizzas1").appendChild(elem);
   }
